@@ -2,12 +2,16 @@ package com.banking.bankstatements.model;
 
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvDate;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.context.annotation.Bean;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.Entity;
 import java.time.LocalDateTime;
 
+@Data
 public class Statement {
     @CsvBindByName @Getter @Setter
     private String accountNumber;

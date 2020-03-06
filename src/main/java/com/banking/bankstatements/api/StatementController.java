@@ -6,6 +6,7 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
 import com.opencsv.bean.*;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
@@ -25,12 +26,10 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-
+@Slf4j
 @RestController
 public class StatementController {
     private final StatementService statementService;
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-
 
     public StatementController(StatementService statementService) {
         this.statementService = statementService;
@@ -38,44 +37,12 @@ public class StatementController {
 
     @PostMapping("/import-csv")
     public void uploadCSVFile(@RequestParam("file") MultipartFile file) {
-        if (file.isEmpty()) {
-            System.out.println("File is empty");
-        }
-        else {
-            try  {
-                String line;
-                InputStream is = file.getInputStream();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-                line = reader.readLine();
-                while ((line = reader.readLine()) != null) {
-                    String[] statementString = line.split(",");
-                    for (int i  = 0; i<6; i++){
-                        if(i==3) continue;
-                        if(statementString[i].isBlank()) throw new BaseException("Wrong input");
-                    }
-                    Statement st = new Statement(statementString[0], LocalDateTime.parse(statementString[1],formatter),statementString[2],statementString[3],Double.parseDouble(statementString[4]),statementString[5]);
-                    statementService.addStatement(st);
-                }
-            } catch (Exception | BaseException ex) {
-                System.out.println(ex.getMessage());
-            }
-        }
+        statementService.addStatement(file);
     }
 
     @GetMapping("export-csv")
     public void getAllStatementsInCsv(HttpServletResponse response) throws Exception{
-        String fileName ="Statements-";
-        fileName += new SimpleDateFormat("yyyyMMddHHmm'.csv'").format(new Date());
-        response.setContentType("text/csv");
-        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\"" + fileName + "\"");
-
-        StatefulBeanToCsv<Statement> writer = new StatefulBeanToCsvBuilder<Statement>(response.getWriter())
-                .withQuotechar(CSVWriter.NO_QUOTE_CHARACTER)
-                .withSeparator(CSVWriter.DEFAULT_SEPARATOR)
-                .withOrderedResults(false)
-                .build();
-
-        writer.write(statementService.getStatement());
+        statementService.getStatementAsCsv(response);
     }
 
     @GetMapping("export")
