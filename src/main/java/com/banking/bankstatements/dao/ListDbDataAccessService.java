@@ -21,11 +21,6 @@ public class ListDbDataAccessService implements StatementDao {
 
     @Override
     public List<Statement> exportStatementByDate(LocalDateTime dateFrom, LocalDateTime dateTo) {
-        System.out.println("test");
-        System.out.println(dateFrom);
-        System.out.println(dateTo);
-        System.out.println(DB.stream()
-                .filter(dates -> dates.getOperationDate().isAfter(dateFrom) && dates.getOperationDate().isBefore(dateTo)).collect(Collectors.toList()).toString());
         return DB.stream()
                 .filter(dates -> dates.getOperationDate().isAfter(dateFrom) && dates.getOperationDate().isBefore(dateTo)).collect(Collectors.toList());
     }
@@ -36,12 +31,12 @@ public class ListDbDataAccessService implements StatementDao {
     }
 
     @Override
-    public double calculateAmount(String accountNumber) {
-        return DB.stream().filter(db -> db.getAccountNumber().equals(accountNumber)).mapToDouble(Statement::getAmount).sum();
+    public List<Statement> calculateAmount(String accountNumber) {
+        return DB.stream().filter(db -> db.getAccountNumber().equals(accountNumber)).collect(Collectors.toList());
     }
 
     @Override
-    public double calculateAmount(String accountNumber, LocalDateTime dateFrom, LocalDateTime dateTo) {
-        return DB.stream().filter(db -> db.getAccountNumber().equals(accountNumber) && db.getOperationDate().isAfter(dateFrom) && db.getOperationDate().isBefore(dateTo)).mapToDouble(Statement::getAmount).sum();
+    public List<Statement> calculateAmount(String accountNumber, LocalDateTime dateFrom, LocalDateTime dateTo) {
+        return DB.stream().filter(db -> db.getAccountNumber().equals(accountNumber) && db.getOperationDate().isAfter(dateFrom) && db.getOperationDate().isBefore(dateTo)).collect(Collectors.toList());
     }
 }

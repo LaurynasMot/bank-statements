@@ -14,7 +14,7 @@ public interface StatementDao {
 
     List<Statement> exportStatement();
 
-    double calculateAmount(String accountNumber);
+    List<Statement> calculateAmount(String accountNumber);
 
-    double calculateAmount(String accountNumber, LocalDateTime dateFrom, LocalDateTime dateTo);
+    List<Statement> calculateAmount(String accountNumber, LocalDateTime dateFrom, LocalDateTime dateTo);
 }
