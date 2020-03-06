@@ -2,6 +2,7 @@ package com.banking.bankstatements.service;
 
 import com.banking.bankstatements.api.BaseException;
 import com.banking.bankstatements.dao.StatementDao;
+import com.banking.bankstatements.model.Dates;
 import com.banking.bankstatements.model.Statement;
 import com.opencsv.CSVWriter;
 import com.opencsv.bean.StatefulBeanToCsv;
@@ -99,5 +100,20 @@ public class StatementService {
                 .build();
 
         writer.write(statementDao.exportStatement());
+    }
+
+    public void getStatementAsCsvByDate(HttpServletResponse response, LocalDateTime dateFrom, LocalDateTime dateTo) throws CsvDataTypeMismatchException, CsvRequiredFieldEmptyException, IOException {
+        String fileName ="Statements-";
+        fileName += new SimpleDateFormat("yyyyMMddHHmm'.csv'").format(new Date());
+        response.setContentType("text/csv");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\"" + fileName + "\"");
+
+        StatefulBeanToCsv<Statement> writer = new StatefulBeanToCsvBuilder<Statement>(response.getWriter())
+                .withQuotechar(CSVWriter.NO_QUOTE_CHARACTER)
+                .withSeparator(CSVWriter.DEFAULT_SEPARATOR)
+                .withOrderedResults(false)
+                .build();
+
+        writer.write(statementDao.exportStatementByDate(dateFrom, dateTo));
     }
 }

@@ -1,5 +1,6 @@
 package com.banking.bankstatements.api;
 
+import com.banking.bankstatements.model.Dates;
 import com.banking.bankstatements.model.Statement;
 import com.banking.bankstatements.service.StatementService;
 import com.opencsv.CSVReader;
@@ -35,35 +36,38 @@ public class StatementController {
         this.statementService = statementService;
     }
 
-    @PostMapping("/import-csv")
+    @PostMapping("import-csv")
     public void uploadCSVFile(@RequestParam("file") MultipartFile file) {
         statementService.addStatement(file);
     }
 
-    @GetMapping("export-csv")
-    public void getAllStatementsInCsv(HttpServletResponse response) throws Exception{
-        statementService.getStatementAsCsv(response);
+    @PostMapping("export-csv")
+    public void getAllStatementsInCsv(HttpServletResponse response, @RequestBody(required = false) Dates dates) throws Exception{
+        if(dates == null) statementService.getStatementAsCsv(response);
+        else {
+            if(dates.getDateFrom() == null) statementService.getStatementAsCsvByDate(response, LocalDateTime.MIN, dates.getDateTo());
+            if(dates.getDateTo() == null) statementService.getStatementAsCsvByDate(response, dates.getDateFrom(), LocalDateTime.MAX);
+            statementService.getStatementAsCsvByDate(response, dates.getDateFrom(), dates.getDateTo());
+        }
     }
 
-    @GetMapping("export")
-    public List<Statement> getAllStatements(){
-        return statementService.getStatement();
+    @PostMapping("export")
+    public List<Statement> getAllStatements(@RequestBody(required = false) Dates dates){
+        if(dates == null) return statementService.getStatement();
+        else {
+            if(dates.getDateFrom() == null) return statementService.getStatementByDate(LocalDateTime.MIN, dates.getDateTo());
+            if(dates.getDateTo() == null) return statementService.getStatementByDate(dates.getDateFrom(), LocalDateTime.MAX);
+            return statementService.getStatementByDate(dates.getDateFrom(), dates.getDateTo());
+        }
     }
 
-    @GetMapping(value = "{timeFrom}-{timeTo}")
-    public List<Statement> getAllStatementsByDate(@PathVariable("timeFrom") long dateFrom, @PathVariable("timeTo") long dateTo){
-        return statementService.getStatementByDate(Instant.ofEpochSecond(dateFrom).atZone(ZoneId.systemDefault()).toLocalDateTime(), Instant.ofEpochSecond(dateTo).atZone(ZoneId.systemDefault()).toLocalDateTime());
-    }
-
-    @GetMapping(value = "balance/{nr}")
-    public double getBalanceByNumber(@PathVariable("nr") String accountNumber) throws IOException, JSONException {
-        return statementService.getAmount(accountNumber);
-    }
-
-    @GetMapping(value = "balance/{nr}/{timeFrom}-{timeTo}")
-    public double getBalanceByNumberAndDate(@PathVariable("nr") String accountNumber, @PathVariable("timeFrom") long dateFrom, @PathVariable("timeTo") long dateTo) throws IOException, JSONException {
-        return statementService.getAmountByDate(accountNumber,
-                Instant.ofEpochSecond(dateFrom).atZone(ZoneId.systemDefault()).toLocalDateTime(),
-                Instant.ofEpochSecond(dateTo).atZone(ZoneId.systemDefault()).toLocalDateTime());
+    @PostMapping("balance/{nr}")
+    public double getBalanceByNumber(@PathVariable("nr") String accountNumber, @RequestBody(required = false) Dates dates) throws IOException, JSONException {
+        if(dates == null) return statementService.getAmount(accountNumber);
+        else {
+            if(dates.getDateFrom() == null) return statementService.getAmountByDate(accountNumber, LocalDateTime.MIN, dates.getDateTo());
+            if(dates.getDateTo() == null) return statementService.getAmountByDate(accountNumber, dates.getDateFrom(), LocalDateTime.MAX);
+            return statementService.getAmountByDate(accountNumber, dates.getDateFrom(), dates.getDateTo());
+        }
     }
 }
