@@ -30,12 +30,12 @@ public class ListDbDataAccessService implements StatementDao {
     }
 
     @Override
-    public List<Statement> calculateAmount(String accountNumber) {
+    public List<Statement> getStatementsToCalcAmount(String accountNumber) {
         return DB.stream().filter(db -> db.getAccountNumber().equals(accountNumber)).collect(Collectors.toList());
     }
 
     @Override
-    public List<Statement> calculateAmount(String accountNumber, LocalDateTime dateFrom, LocalDateTime dateTo) {
+    public List<Statement> getStatementsToCalcAmount(String accountNumber, LocalDateTime dateFrom, LocalDateTime dateTo) {
         return DB.stream().filter(db -> db.getAccountNumber().equals(accountNumber) && db.getOperationDate().isAfter(dateFrom) && db.getOperationDate().isBefore(dateTo)).collect(Collectors.toList());
     }
 }

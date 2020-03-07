@@ -13,8 +13,8 @@ public interface StatementDao {
 
     List<Statement> exportStatement();
 
-    List<Statement> calculateAmount(String accountNumber);
+    List<Statement> getStatementsToCalcAmount(String accountNumber);
 
-    List<Statement> calculateAmount(String accountNumber, LocalDateTime dateFrom, LocalDateTime dateTo);
+    List<Statement> getStatementsToCalcAmount(String accountNumber, LocalDateTime dateFrom, LocalDateTime dateTo);
 
 }

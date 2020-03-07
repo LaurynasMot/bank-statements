@@ -31,8 +31,8 @@ import java.util.List;
 @Slf4j
 public class StatementService {
     private final StatementDao statementDao;
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-    ExchangeService exchangeCurrency = new ExchangeService("EUR");
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private ExchangeService exchangeCurrency = new ExchangeService();
 
     @Autowired
     public StatementService(@Qualifier("listDB") StatementDao statementDao) {
@@ -73,13 +73,29 @@ public class StatementService {
     }
 
     public double getAmount(String accountNumber) throws IOException, JSONException {
-        List<Statement> statements = statementDao.calculateAmount(accountNumber);
-        return exchangeCurrency.exchangeCurrency(statements);
+        double sum = 0;
+        List<Statement> statements = statementDao.getStatementsToCalcAmount(accountNumber);
+        for (Statement st: statements) {
+            if(st.getCurrency().equals("EUR"))
+            {
+                sum+=st.getAmount();
+            }
+            else sum+=exchangeCurrency.exchangeCurrency(st.getAmount(), st.getCurrency());
+        }
+        return sum;
     }
 
     public double getAmountByDate(String accountNumber, LocalDateTime dateFrom, LocalDateTime dateTo) throws IOException, JSONException {
-        List<Statement> statements = statementDao.calculateAmount(accountNumber, dateFrom, dateTo);
-        return exchangeCurrency.exchangeCurrency(statements);
+        double sum = 0;
+        List<Statement> statements = statementDao.getStatementsToCalcAmount(accountNumber, dateFrom, dateTo);
+        for (Statement st: statements) {
+            if(st.getCurrency().equals("EUR"))
+            {
+                sum+=st.getAmount();
+            }
+            else sum+=exchangeCurrency.exchangeCurrency(st.getAmount(), st.getCurrency());
+        }
+        return sum;
     }
 
 
