@@ -1,6 +1,6 @@
 package com.banking.bankstatements.dao;
 
-import com.banking.bankstatements.model.Statement;
+import com.banking.bankstatements.entity.Statement;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;

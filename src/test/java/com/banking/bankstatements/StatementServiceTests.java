@@ -1,8 +1,7 @@
 package com.banking.bankstatements;
 
 import com.banking.bankstatements.dao.ListDbDataAccessService;
-import com.banking.bankstatements.model.Statement;
-import com.banking.bankstatements.service.ExchangeService;
+import com.banking.bankstatements.entity.Statement;
 import com.banking.bankstatements.service.StatementService;
 import org.json.JSONException;
 import org.junit.BeforeClass;

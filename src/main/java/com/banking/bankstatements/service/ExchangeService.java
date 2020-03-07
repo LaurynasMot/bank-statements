@@ -1,6 +1,5 @@
 package com.banking.bankstatements.service;
 
-import com.banking.bankstatements.model.Statement;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
@@ -10,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.List;
 
 @Component
 public class ExchangeService{

@@ -1,7 +1,8 @@
 package com.banking.bankstatements;
 
 import com.banking.bankstatements.dao.ListDbDataAccessService;
-import com.banking.bankstatements.model.Statement;
+import com.banking.bankstatements.entity.Statement;
+import com.banking.bankstatements.request.Dates;
 import com.banking.bankstatements.service.ExchangeService;
 import com.banking.bankstatements.service.StatementService;
 import org.json.JSONException;
@@ -38,6 +39,7 @@ public class ExchangeServiceTests {
     @Test
     public void testGetAmountExchanged() throws IOException, JSONException {
         List<Statement> statementTest= new ArrayList<Statement>();
+        Dates dates = new Dates(null, null);
         statementTest.add(new Statement("LT667044060007944470", LocalDateTime.parse("2020-03-06 20:13",formatter),"TEST LT","",-50.50,"GBP"));
         statementTest.add(new Statement("LT667044060007944470", LocalDateTime.parse("2020-03-08 20:25",formatter),"TEST LT","",-1.44,"EUR"));
 

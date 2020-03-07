@@ -1,4 +1,4 @@
-package com.banking.bankstatements.model;
+package com.banking.bankstatements.request;
 
 import lombok.Getter;
 import lombok.Setter;

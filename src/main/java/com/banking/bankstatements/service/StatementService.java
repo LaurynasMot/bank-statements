@@ -1,8 +1,8 @@
 package com.banking.bankstatements.service;
 
-import com.banking.bankstatements.api.BaseException;
 import com.banking.bankstatements.dao.StatementDao;
-import com.banking.bankstatements.model.Statement;
+import com.banking.bankstatements.entity.Statement;
+import com.banking.bankstatements.request.Dates;
 import com.opencsv.CSVWriter;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
@@ -17,13 +17,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -53,23 +51,24 @@ public class StatementService {
                     String[] statementString = line.split(",");
                     for (int i  = 0; i<6; i++){
                         if(i==3) continue;
-                        if(statementString[i].isBlank()) throw new BaseException("Wrong input");
+                        if(statementString[i].isBlank()) log.warn("Wrong input");
                     }
                     Statement st = new Statement(statementString[0], LocalDateTime.parse(statementString[1],formatter),statementString[2],statementString[3],Double.parseDouble(statementString[4]),statementString[5]);
                     statementDao.importStatement(st);
                 }
-            } catch (Exception | BaseException ex) {
+            } catch (Exception ex) {
                 log.error(ex.getMessage());
             }
         }
     }
 
-    public List<Statement> getStatementByDate(LocalDateTime dateFrom, LocalDateTime dateTo){
-        return statementDao.exportStatementByDate(dateFrom, dateTo);
-    }
-
-    public List<Statement> getStatement(){
-        return statementDao.exportStatement();
+    public List<Statement> getStatement(Dates dates){
+        if(dates == null) return statementDao.exportStatement();
+        else {
+            if(dates.getDateFrom() == null) return statementDao.exportStatementByDate(LocalDateTime.MIN, dates.getDateTo());
+            if(dates.getDateTo() == null) return statementDao.exportStatementByDate(dates.getDateFrom(), LocalDateTime.MAX);
+            return statementDao.exportStatementByDate(dates.getDateFrom(), dates.getDateTo());
+        }
     }
 
     public double getAmount(String accountNumber) throws IOException, JSONException {
@@ -98,8 +97,7 @@ public class StatementService {
         return sum;
     }
 
-
-    public void getStatementAsCsv(HttpServletResponse response) throws CsvDataTypeMismatchException, CsvRequiredFieldEmptyException, IOException {
+    public void getStatementAsCsv(HttpServletResponse response, Dates dates) throws CsvDataTypeMismatchException, CsvRequiredFieldEmptyException, IOException {
         String fileName ="Statements-";
         fileName += new SimpleDateFormat("yyyyMMddHHmm'.csv'").format(new Date());
         response.setContentType("text/csv");
@@ -111,21 +109,9 @@ public class StatementService {
                 .withOrderedResults(false)
                 .build();
 
-        writer.write(statementDao.exportStatement());
-    }
-
-    public void getStatementAsCsvByDate(HttpServletResponse response, LocalDateTime dateFrom, LocalDateTime dateTo) throws CsvDataTypeMismatchException, CsvRequiredFieldEmptyException, IOException {
-        String fileName ="Statements-";
-        fileName += new SimpleDateFormat("yyyyMMddHHmm'.csv'").format(new Date());
-        response.setContentType("text/csv");
-        response.setHeader(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\"" + fileName + "\"");
-
-        StatefulBeanToCsv<Statement> writer = new StatefulBeanToCsvBuilder<Statement>(response.getWriter())
-                .withQuotechar(CSVWriter.NO_QUOTE_CHARACTER)
-                .withSeparator(CSVWriter.DEFAULT_SEPARATOR)
-                .withOrderedResults(false)
-                .build();
-
-        writer.write(statementDao.exportStatementByDate(dateFrom, dateTo));
+        if(dates == null) writer.write(statementDao.exportStatement());
+        else if (dates.getDateFrom() == null) writer.write(statementDao.exportStatementByDate(LocalDateTime.MIN, dates.getDateTo()));
+        else if (dates.getDateTo() == null) writer.write(statementDao.exportStatementByDate(dates.getDateFrom(), LocalDateTime.MAX));
+        else writer.write(statementDao.exportStatementByDate(dates.getDateFrom(), dates.getDateTo()));
     }
 }
