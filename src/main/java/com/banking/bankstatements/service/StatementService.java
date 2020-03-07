@@ -21,7 +21,6 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -73,7 +72,7 @@ public class StatementService {
 
     public double getAmount(String accountNumber) throws IOException, JSONException {
         double sum = 0;
-        List<Statement> statements = statementDao.getStatementsToCalcAmount(accountNumber);
+        List<Statement> statements = statementDao.findStatementsToCalcAmount(accountNumber);
         for (Statement st: statements) {
             if(st.getCurrency().equals("EUR"))
             {
@@ -86,7 +85,7 @@ public class StatementService {
 
     public double getAmountByDate(String accountNumber, LocalDateTime dateFrom, LocalDateTime dateTo) throws IOException, JSONException {
         double sum = 0;
-        List<Statement> statements = statementDao.getStatementsToCalcAmount(accountNumber, dateFrom, dateTo);
+        List<Statement> statements = statementDao.findStatementsToCalcAmount(accountNumber, dateFrom, dateTo);
         for (Statement st: statements) {
             if(st.getCurrency().equals("EUR"))
             {
