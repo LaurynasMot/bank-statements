@@ -3,30 +3,15 @@ package com.banking.bankstatements.api;
 import com.banking.bankstatements.model.Dates;
 import com.banking.bankstatements.model.Statement;
 import com.banking.bankstatements.service.StatementService;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
-import com.opencsv.CSVWriter;
-import com.opencsv.bean.*;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
-import org.springframework.http.HttpHeaders;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.swing.plaf.nimbus.State;
 import java.io.*;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 @Slf4j
 @RestController
 public class StatementController {

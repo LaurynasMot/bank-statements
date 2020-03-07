@@ -2,7 +2,6 @@ package com.banking.bankstatements.service;
 
 import com.banking.bankstatements.api.BaseException;
 import com.banking.bankstatements.dao.StatementDao;
-import com.banking.bankstatements.model.Dates;
 import com.banking.bankstatements.model.Statement;
 import com.opencsv.CSVWriter;
 import com.opencsv.bean.StatefulBeanToCsv;
@@ -11,7 +10,6 @@ import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
@@ -23,15 +21,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
-@Service
+@Service("statementService")
 @Slf4j
 public class StatementService {
     private final StatementDao statementDao;
